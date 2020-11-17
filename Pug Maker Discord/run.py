@@ -40,7 +40,7 @@ async def close(ctx):
     await bot.close()
 
 @bot.command(name = "verify", pass_context=True)
-async def verify_steam(ctx, arg):
+async def verify(ctx, arg):
     #print(ctx)
     found = -1
 

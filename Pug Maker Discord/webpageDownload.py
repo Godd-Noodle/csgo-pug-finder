@@ -2,7 +2,7 @@ import urllib.request, urllib.error, urllib.parse
 
 
 faceituser = "PaddyVac" 
-
+url_start = "https://faceitstats.com/player,"
 
 
 webpage = "https://faceitstats.com/player,"
