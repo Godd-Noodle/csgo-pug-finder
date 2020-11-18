@@ -30,6 +30,8 @@ bot = commands.Bot(command_prefix=PREFIX)
 #bot.remove_command("help")
 @bot.event
 async def on_ready():
+    #activity = discord.Game(name="with the laws of reality", type=3)
+    await bot.change_presence(status=discord.Status.do_not_disturb)# , activity = activity
     print("Bot is ready")
 
 
@@ -42,6 +44,7 @@ async def respond(ctx):
 @commands.dm_only()
 async def close(ctx):
     await ctx.send("shutting down!!")
+    await bot.change_presence(status=discord.Status.offline)
     await bot.close()
 
 @bot.command(name = "verify", pass_context=True)
