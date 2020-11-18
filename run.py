@@ -10,7 +10,7 @@ from discord.ext.commands import has_role
 import json
 
 # read file
-with open('credentials_discord.json', 'r') as myfile:
+with open("Pug Maker Discord\run.py", 'r') as myfile:
     data=myfile.read()
 
 # parse file
@@ -41,8 +41,7 @@ async def close(ctx):
     await bot.close()
 
 @bot.command(name = "verify", pass_context=True)
-
-async def vfaceit(ctx,arg):
+async def verify(ctx,arg):
     
     response = urllib.request.urlopen(urlFaceitStats +arg)
     
@@ -99,9 +98,16 @@ async def print_all(ctx, arg):
     
 
 
+#Past this point are event handlings
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Please send in all required arguments")
 
-
-
+@verify.error
+async def verifyError(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Please specify a FACEIT username to begin verification steps ")
 
 bot.run(TOKEN)
