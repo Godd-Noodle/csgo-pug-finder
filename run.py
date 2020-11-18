@@ -10,7 +10,7 @@ from discord.ext.commands import has_role
 import json
 
 # read file
-with open("Pug Maker Discord\run.py", 'r') as myfile:
+with open("credentials_discord.json", 'r') as myfile:
     data=myfile.read()
 
 # parse file
@@ -28,6 +28,10 @@ urlSteam = "https://steamcommunity.com/profiles/"
 bot = commands.Bot(command_prefix=PREFIX)
 
 #bot.remove_command("help")
+@bot.event
+async def on_ready():
+    print("Bot is ready")
+
 
 @bot.command(name = "ping")
 async def respond(ctx):
