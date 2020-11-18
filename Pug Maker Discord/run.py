@@ -34,12 +34,14 @@ async def respond(ctx):
     await ctx.send('pong')
 
 @bot.command(name = "quit")
-@has_role("Head Honchos")
+@commands.is_owner()
+@commands.dm_only()
 async def close(ctx):
-
+    await ctx.send("shutting down!!")
     await bot.close()
 
 @bot.command(name = "verify", pass_context=True)
+
 async def vfaceit(ctx,arg):
     
     response = urllib.request.urlopen(urlFaceitStats +arg)
@@ -77,9 +79,9 @@ async def vfaceit(ctx,arg):
     if (found == -1):
         await ctx.send(f"could not find your discord id '{ctx.author}'on this steam profile, ensure it has this so we can verify that it is your account we are linking to your faceit")
         return
-    await ctx.send(f"index of found is {found}, faceit level is {faceitLevel}")
-    role = discord.utils.get(ctx.author.guild.roles, name = "Linked")
-    await ctx.author.add_roles(role)
+    await ctx.send(f"Welcome {str(arg)}, thank you for verifying your account, you can now remove your discord tag from your steam account if you wish")
+    roleLinked = discord.utils.get(ctx.author.guild.roles, name = "Linked")
+    await ctx.author.add_roles(roleLinked)
     roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "FACEIT " + str(faceitLevel))
     await ctx.author.add_roles(roleFaceitLevel)
     if not (str(ctx.author) == "Godd_Noodle#3075"):
