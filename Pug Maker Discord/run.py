@@ -81,8 +81,11 @@ async def vfaceit(ctx,arg):
     await ctx.send(f"index of found is {found}, faceit level is {faceitLevel}")
     role = discord.utils.get(ctx.author.guild.roles, name = "Linked")
     await ctx.author.add_roles(role)
-    role = discord.utils.get(ctx.author.guild.roles, name = str(faceitLevel))
-    await ctx.author.add_roles(role)
+    roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "FACEIT " + str(faceitLevel))
+    await ctx.author.add_roles(roleFaceitLevel)
+    if (str(ctx.author) == "Godd_Noodle#3075"):
+
+        await ctx.author.edit(nick=str(arg))
     print(faceitLevel)  
 
 @bot.command(name = "verify", pass_context=True)
