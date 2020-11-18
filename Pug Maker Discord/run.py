@@ -22,8 +22,8 @@ TOKEN = str(creds_discord["TOKEN"])
 PREFIX = str(creds_discord["PREFIX"])
 
 
-url_start = "https://faceitstats.com/player,"
-steam_pre = 'http://steamcommunity.com/id/'
+urlFaceitStats = "https://faceitstats.com/player,"
+urlSteam = "https://steamcommunity.com/profiles/"
 
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -39,15 +39,14 @@ async def close(ctx):
 
     await bot.close()
 
-@bot.command(name = "vfaceit", pass_context=True)
+@bot.command(name = "verify", pass_context=True)
 async def vfaceit(ctx,arg):
     
-    webpage = "https://faceitstats.com/player,"
-    response = urllib.request.urlopen(webpage +arg)
+    response = urllib.request.urlopen(urlFaceitStats +arg)
     
     webcontentfs = str(response.read())
 
-    index = webcontentfs.find("https://steamcommunity.com/profiles/")
+    index = webcontentfs.find(urlSteam)
 
 
     if (index == -1):
@@ -55,9 +54,9 @@ async def vfaceit(ctx,arg):
         return
     i_e = webcontentfs[index:].find('"')
 
-    steamurl = webcontentfs[index:index+i_e]
+    urlSteamFull = webcontentfs[index:index+i_e]
 
-    response = urllib.request.urlopen(steamurl)
+    response = urllib.request.urlopen(urlSteamFull)
     
     webcontentsteam = str(response.read())
     
@@ -83,44 +82,13 @@ async def vfaceit(ctx,arg):
     await ctx.author.add_roles(role)
     roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "FACEIT " + str(faceitLevel))
     await ctx.author.add_roles(roleFaceitLevel)
-    if (str(ctx.author) == "Godd_Noodle#3075"):
+    if not (str(ctx.author) == "Godd_Noodle#3075"):
 
         await ctx.author.edit(nick=str(arg))
-    print(faceitLevel)  
+    #print(faceitLevel)  
 
-@bot.command(name = "verify", pass_context=True)
-async def verify(ctx, arg):
-    #print(ctx)
-    found = -1
 
-    if not str(arg).startswith(steam_pre):
-        
-        
-        return
-    
-    #print(url)
-    
-    response = urllib.request.urlopen(str(arg))
-    
-    webcontent = str(response.read())
-    
-    
-    
-    p_s = webcontent.find(str('<div class="profile_summary">'))
-    p_e = webcontent.find(str('<div class="profile_summary_footer">'))
 
-    
-    found = webcontent[p_s:p_e].find(str(ctx.author))
-
-    if not found == -1:
-        
-        
-        role = discord.utils.get(ctx.author.guild.roles, name = "Linked")
-        
-        await ctx.author.add_roles(role)
-    
-        
-    
         
 @bot.command(name = "print")
 async def print_all(ctx, arg):
