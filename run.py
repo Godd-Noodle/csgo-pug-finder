@@ -28,16 +28,41 @@ urlSteam = "https://steamcommunity.com/profiles/"
 bot = commands.Bot(command_prefix=PREFIX)
 
 #bot.remove_command("help")
+
+
 @bot.event
 async def on_ready():
     #activity = discord.Game(name="with the laws of reality", type=3)
     await bot.change_presence(status=discord.Status.do_not_disturb)# , activity = activity
     print("Bot is ready")
 
+@bot.command(name = "ready")
+async def ready(ctx):
+
+    authorRoles = ", ".join([str(r.name) for r in ctx.author.roles])
+    print(authorRoles)
+    readyRole = get(ctx.message.guild.roles, name='Ready')
+    if not  authorRoles.find("Ready") == -1:
+        await ctx.author.remove_roles(readyRole)
+    else:
+        
+        await ctx.author.add_roles(readyRole)
+
+    
+
+    
+@bot.command(name = "roles")
+async def roles(ctx):
+    print(", ".join([str(r.name) for r in ctx.guild.roles]))
+    print(ctx.guild.roles)
+
+    for role in ctx.author.roles:
+        print(str(role))
 
 @bot.command(name = "ping")
 async def respond(ctx):
     await ctx.send('pong')
+    print(f"{str(ctx.author)} sent command !ping")
 
 @bot.command(name = "quit")
 @commands.is_owner()
