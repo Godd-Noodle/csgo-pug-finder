@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import urllib.request, urllib.error, urllib.parse
-from discord.ext.commands import has_role
+#from discord.ext.commands import has_role
 
 
 
@@ -38,6 +38,11 @@ async def on_ready():
 
 @bot.command(name = "ready")
 async def ready(ctx):
+    channel = "ready"
+    if not str(ctx.channel) == channel:
+        print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
+        return
+
 
     authorRoles = ", ".join([str(r.name) for r in ctx.author.roles])
     print(authorRoles)
@@ -48,19 +53,22 @@ async def ready(ctx):
         
         await ctx.author.add_roles(readyRole)
 
-    
 
-    
 @bot.command(name = "roles")
+@commands.is_owner
 async def roles(ctx):
     print(", ".join([str(r.name) for r in ctx.guild.roles]))
     print(ctx.guild.roles)
-
+    
     for role in ctx.author.roles:
         print(str(role))
 
 @bot.command(name = "ping")
 async def respond(ctx):
+    channel = "bot"
+    if not str(ctx.channel) == channel:
+        print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
+        return
     await ctx.send('pong')
     print(f"{str(ctx.author)} sent command !ping")
 
@@ -74,6 +82,11 @@ async def close(ctx):
 
 @bot.command(name = "verify", pass_context=True)
 async def verify(ctx,arg):
+    channel = "verify"
+    if not str(ctx.channel) == channel:
+        print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
+        return
+    
     
     response = urllib.request.urlopen(urlFaceitStats +arg)
     
@@ -83,7 +96,7 @@ async def verify(ctx,arg):
 
 
     if (index == -1):
-        await ctx.send("This isnt a faceit profile")
+        await ctx.send("`This isnt a faceit profile`")
         return
     i_e = webcontentfs[index:].find('"')
 
@@ -108,7 +121,7 @@ async def verify(ctx,arg):
     found = webcontentsteam[p_s:p_e].find(str(ctx.author))
 
     if (found == -1):
-        await ctx.send(f"could not find your discord id '{ctx.author}'on this steam profile, ensure it has this so we can verify that it is your account we are linking to your faceit")
+        await ctx.send(f"`could not find your discord id '{ctx.author}'on this steam profile, ensure it has this so we can verify that it is your account we are linking to your faceit`")
         return
     
     roleLinked = discord.utils.get(ctx.author.guild.roles, name = "Linked")
@@ -118,19 +131,15 @@ async def verify(ctx,arg):
     if not (ctx.author) == ctx.guild.owner:
 
         await ctx.author.edit(nick=str(arg))
-    await ctx.send(f"Welcome {str(arg)}, thank you for verifying your account, you can now remove your discord tag from your steam account if you wish")
+    await ctx.send(f"`Welcome {str(arg)}, thank you for verifying your account, you can now remove your discord tag from your steam account if you wish`")
     #print(faceitLevel)  
 
-
-
-        
+  
 @bot.command(name = "print")
 async def print_all(ctx, arg):
     await ctx.channel.send(ctx.author)
     await ctx.channel.send(ctx.message)
     
-
-
 #Past this point are event handlings
 
 @bot.event
