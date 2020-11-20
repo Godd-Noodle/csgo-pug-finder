@@ -45,7 +45,7 @@ async def on_reaction_add(ctx, arg):
         return
     if ctx.message.channel.name == "live-lobbies" and ctx.emoji.id == 779068863672615012:
         #can now start edditing messages to add to q
-    
+        print()
     
     
     
@@ -172,7 +172,6 @@ async def lobby(ctx, *arg):
 @commands.has_permissions(administrator=True)
 async def purge(ctx, limit: int):
         await ctx.channel.purge(limit=limit)
-        await ctx.send('Cleared by {}'.format(ctx.author.mention))
         await ctx.message.delete()
 
 #Past this point are event handlings
