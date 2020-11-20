@@ -43,8 +43,9 @@ async def on_ready():
 async def on_reaction_add(ctx, arg):
     if arg.id  == bot.user.id:
         return
+    if ctx.message.channel.name == "live-lobbies" and ctx.emoji.id == 779068863672615012:
+        #can now start edditing messages to add to q
     
-    #add perosn to q
     
     
     
