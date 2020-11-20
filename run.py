@@ -39,6 +39,16 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.do_not_disturb)# , activity = activity
     print("Bot is ready")
 
+@bot.event
+async def on_reaction_add(ctx, arg):
+    if arg.id  == bot.user.id:
+        return
+    
+    #add perosn to q
+    
+    
+    
+
 @bot.command(name = "ready")
 async def ready(ctx):
     channel = "ready"
@@ -152,12 +162,17 @@ async def lobby(ctx, *arg):
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
         return
     channelLL = discord.utils.get(ctx.guild.text_channels, name="live-lobbies")
-    await channelLL.send(f"`Faceit lobby created\n\nPlayers:\n@{str(ctx.author)}\n\nRange:\nNOT IMPLEMENTED YET`")
+    message = await channelLL.send(f"Faceit lobby created\n\nPlayers:\n{str(ctx.author.mention)}\n\nRange:\nNOT IMPLEMENTED YET")
+    await message.add_reaction(get(ctx.guild.emojis, name="tick"))
     
-    
 
 
-
+@bot.command(name = "purge",pass_context=True)
+@commands.has_permissions(administrator=True)
+async def purge(ctx, limit: int):
+        await ctx.channel.purge(limit=limit)
+        await ctx.send('Cleared by {}'.format(ctx.author.mention))
+        await ctx.message.delete()
 
 #Past this point are event handlings
 
@@ -165,6 +180,8 @@ async def lobby(ctx, *arg):
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Please send in all required arguments")
+
+    print(error)
 
 @verify.error
 async def verifyError(ctx, error):
