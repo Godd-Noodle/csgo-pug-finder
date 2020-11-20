@@ -27,6 +27,9 @@ urlSteam = "https://steamcommunity.com/profiles/"
 
 bot = commands.Bot(command_prefix=PREFIX)
 
+
+
+
 #bot.remove_command("help")
 
 
@@ -55,7 +58,7 @@ async def ready(ctx):
 
 
 @bot.command(name = "roles")
-@commands.is_owner
+@commands.is_owner()
 async def roles(ctx):
     print(", ".join([str(r.name) for r in ctx.guild.roles]))
     print(ctx.guild.roles)
@@ -140,6 +143,22 @@ async def print_all(ctx, arg):
     await ctx.channel.send(ctx.author)
     await ctx.channel.send(ctx.message)
     
+#create lobby signups
+@bot.command(name = "lobby")
+async def lobby(ctx, *arg):
+    print("lobby function called")
+    channel = "lobby"
+    if not str(ctx.channel) == channel:
+        print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
+        return
+    channelLL = discord.utils.get(ctx.guild.text_channels, name="live-lobbies")
+    await channelLL.send(f"`Faceit lobby created\n\nPlayers:\n@{str(ctx.author)}\n\nRange:\nNOT IMPLEMENTED YET`")
+    
+    
+
+
+
+
 #Past this point are event handlings
 
 @bot.event
