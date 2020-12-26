@@ -79,12 +79,13 @@ async def roles(ctx):
 
 @bot.command(name = "ping")
 async def respond(ctx):
+    print(f"{str(ctx.author)} sent command !ping")
     channel = "bot"
     if not str(ctx.channel) == channel:
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
         return
     await ctx.send('pong')
-    print(f"{str(ctx.author)} sent command !ping")
+    
 
 @bot.command(name = "quit")
 @commands.is_owner()
