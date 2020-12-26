@@ -45,7 +45,12 @@ async def on_reaction_add(ctx, arg):
         return
     if ctx.message.channel.name == "live-lobbies" and ctx.emoji.id == 779068863672615012:
         #can now start edditing messages to add to q
-        print()
+        print("")
+        if str(arg.id) in ctx.message.content:
+            print("already in the message")
+        else:
+            pos = ctx.message.content.rfind(">")
+            await ctx.edit(ctx, ctx.message[:pos] + str(arg.mention) + ctx.message[pos:])
     
     
     
@@ -91,6 +96,7 @@ async def respond(ctx):
 @commands.is_owner()
 @commands.dm_only()
 async def close(ctx):
+    print("bot shutting down")
     await ctx.send("shutting down!!")
     await bot.change_presence(status=discord.Status.offline)
     await bot.close()
