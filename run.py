@@ -32,7 +32,6 @@ intents = discord.Intents.all()
 intents.members = True
 
 
-urlFaceit = "https://www.faceit.com/en/players/"
 urlSteam = "https://steamcommunity.com/profiles/"
 
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
@@ -126,48 +125,48 @@ async def verify(ctx : context.Context, arg):
     match_details = FaceitData.player_details(fd,arg,"csgo")
     
     #print(match_details)
-    elo = match_details["games"]["csgo"]["faceit_elo"]
+    elo = str(match_details["games"]["csgo"]["faceit_elo"])
+    lvl = str(match_details["games"]["csgo"]["skill_level"])
     urlSteamFull = urlSteam +  match_details["steam_id_64"]
 
-    await ctx.send(elo)
+    await ctx.send(elo + " " + lvl)
 
 
     if (elo == 0):
         await ctx.send("`This isnt a faceit profile, please give your faceit username`")
         return
-    
-    response = urllib.request.urlopen(urlSteamFull)
-    
-    webcontentsteam = str(response.read())
-    print(webcontentsteam)
-    
-    
-    p_s = webcontentsteam.find(str('<div class="profile_summary">'))
-    p_e = webcontentsteam.find(str('<div class="profile_summary_footer">'))
 
     
+    #extract the steam summary and check if the discord tag exists in it
+    response = urllib.request.urlopen(urlSteamFull)
+    webcontentsteam = str(response.read())
+    p_s = webcontentsteam.find(str('<div class="profile_summary">'))
+    p_e = webcontentsteam.find(str('<div class="profile_summary_footer">'))
     found = webcontentsteam[p_s:p_e].find(str(ctx.author))
     #print(found)
+
 
     if (found == -1):
         await ctx.send(f"`could not find your discord id '{ctx.author}' on this steam profile's bio, ensure it has this so we can verify that it is your account we are linking to your FACEIT`")
         return
     
-    lvl = int(np.ceil((elo - 800)/150)) + 1
 
     print(lvl)
-    
-    if lvl > 10:
-        lvl = 10
 
     roleLinked = discord.utils.get(ctx.author.guild.roles, name = "Linked")
     await ctx.author.add_roles(roleLinked)
     roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "Level " + str(lvl))
     await ctx.author.add_roles(roleFaceitLevel)
-    await ctx.author.edit(nick=str(arg))
-
+    
+    
     await ctx.send(f"`Welcome {str(arg)}, thank you for verifying your account, you can now remove your discord tag from your steam account if you wish`")
-    #print(faceitLevel)  
+    
+
+    if ctx.author.id == ctx.guild.owner_id:
+        await ctx.author.send(f"please set your nickname to '{str(arg)}', I dont seem to be able to myself\n(Perhaps you are the server owner)")
+    else:
+        await ctx.author.edit(nick=str(arg))
+
 
   
 @bot.command(name = "print")
