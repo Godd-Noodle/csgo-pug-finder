@@ -1,12 +1,12 @@
+from cgi import test
 import discord
 from discord.ext import commands
 from discord.utils import get
 import urllib.request, urllib.error, urllib.parse
+import numpy as np
+from  faceit import FaceitData
+import discord.ext.commands.context as context
 #from discord.ext.commands import has_role
-
-
-
-
 import json
 
 # read file
@@ -20,12 +20,15 @@ creds_discord = json.loads(data)
 
 TOKEN = str(creds_discord["TOKEN"])
 PREFIX = str(creds_discord["PREFIX"])
+FACEIT_TOKEN = str(creds_discord["FACEIT"])
+intents = discord.Intents.all()
+intents.members = True
 
 
-urlFaceitStats = "https://faceitstats.com/player,"
+urlFaceit = "https://www.faceit.com/en/players/"
 urlSteam = "https://steamcommunity.com/profiles/"
 
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 
 
@@ -40,7 +43,7 @@ async def on_ready():
     print("Bot is ready")
 
 @bot.event
-async def on_reaction_add(ctx, arg):
+async def on_reaction_add(ctx : context.Context, arg):
     if arg.id  == bot.user.id:
         return
     if ctx.message.channel.name == "live-lobbies" and ctx.emoji.id == 779068863672615012:
@@ -56,7 +59,7 @@ async def on_reaction_add(ctx, arg):
     
 
 @bot.command(name = "ready")
-async def ready(ctx):
+async def ready(ctx : context.Context):
     channel = "ready"
     if not str(ctx.channel) == channel:
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
@@ -71,20 +74,21 @@ async def ready(ctx):
     else:
         
         await ctx.author.add_roles(readyRole)
+    
+    ctx.message.delete()
 
 
 @bot.command(name = "roles")
 @commands.is_owner()
-async def roles(ctx):
+async def roles(ctx : context.Context):
     print(", ".join([str(r.name) for r in ctx.guild.roles]))
     print(ctx.guild.roles)
     
-    for role in ctx.author.roles:
-        print(str(role))
+    print(", ".join([str(r.name) for r in ctx.author.roles]))
 
 @bot.command(name = "ping")
-async def respond(ctx):
-    print(f"{str(ctx.author)} sent command !ping")
+async def respond(ctx : context.Context):
+    print(f"{str(ctx.author)} sent command {PREFIX}ping")
     channel = "bot"
     if not str(ctx.channel) == channel:
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
@@ -95,75 +99,78 @@ async def respond(ctx):
 @bot.command(name = "quit")
 @commands.is_owner()
 @commands.dm_only()
-async def close(ctx):
+async def close(ctx : context.Context):
     print("bot shutting down")
     await ctx.send("shutting down!!")
     await bot.change_presence(status=discord.Status.offline)
     await bot.close()
 
 @bot.command(name = "verify", pass_context=True)
-async def verify(ctx,arg):
+async def verify(ctx : context.Context, arg):
+    #Ask for faceit username
+
     channel = "verify"
     if not str(ctx.channel) == channel:
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
         return
     
+    fd = FaceitData(FACEIT_TOKEN)
     
-    response = urllib.request.urlopen(urlFaceitStats +arg)
+    match_details = FaceitData.player_details(fd,arg,"csgo")
     
-    webcontentfs = str(response.read())
+    #print(match_details)
+    elo = match_details["games"]["csgo"]["faceit_elo"]
+    urlSteamFull = urlSteam +  match_details["steam_id_64"]
 
-    index = webcontentfs.find(urlSteam)
+    await ctx.send(elo)
 
 
-    if (index == -1):
-        await ctx.send("`This isnt a faceit profile`")
+    if (elo == 0):
+        await ctx.send("`This isnt a faceit profile, please give your faceit username`")
         return
-    i_e = webcontentfs[index:].find('"')
-
-    urlSteamFull = webcontentfs[index:index+i_e]
-
+    
     response = urllib.request.urlopen(urlSteamFull)
     
     webcontentsteam = str(response.read())
-    
+    print(webcontentsteam)
     
     
     p_s = webcontentsteam.find(str('<div class="profile_summary">'))
     p_e = webcontentsteam.find(str('<div class="profile_summary_footer">'))
 
-
-    level_s = webcontentfs.find("level: <strong>")
-
-    level = webcontentfs[level_s:level_s+20]
-
-    level_filter = filter(str.isdigit, level)
-    faceitLevel = "".join(level_filter)
+    
     found = webcontentsteam[p_s:p_e].find(str(ctx.author))
+    #print(found)
 
     if (found == -1):
-        await ctx.send(f"`could not find your discord id '{ctx.author}'on this steam profile, ensure it has this so we can verify that it is your account we are linking to your faceit`")
+        await ctx.send(f"`could not find your discord id '{ctx.author}' on this steam profile's bio, ensure it has this so we can verify that it is your account we are linking to your FACEIT`")
         return
     
+    lvl = int(np.ceil((elo - 800)/150)) + 1
+
+    print(lvl)
+    
+    if lvl > 10:
+        lvl = 10
+
     roleLinked = discord.utils.get(ctx.author.guild.roles, name = "Linked")
     await ctx.author.add_roles(roleLinked)
-    roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "FACEIT " + str(faceitLevel))
+    roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "Level " + str(lvl))
     await ctx.author.add_roles(roleFaceitLevel)
-    if not (ctx.author) == ctx.guild.owner:
+    await ctx.author.edit(nick=str(arg))
 
-        await ctx.author.edit(nick=str(arg))
     await ctx.send(f"`Welcome {str(arg)}, thank you for verifying your account, you can now remove your discord tag from your steam account if you wish`")
     #print(faceitLevel)  
 
   
 @bot.command(name = "print")
-async def print_all(ctx, arg):
+async def print_all(ctx : context.Context, arg):
     await ctx.channel.send(ctx.author)
     await ctx.channel.send(ctx.message)
     
 #create lobby signups
 @bot.command(name = "lobby")
-async def lobby(ctx, *arg):
+async def lobby(ctx : context.Context, *arg):
     print("lobby function called")
     channel = "lobby"
     if not str(ctx.channel) == channel:
@@ -177,21 +184,32 @@ async def lobby(ctx, *arg):
 
 @bot.command(name = "purge",pass_context=True)
 @commands.has_permissions(administrator=True)
-async def purge(ctx, limit: int):
-        await ctx.channel.purge(limit=limit)
-        await ctx.message.delete()
+async def purge(ctx : context.Context, count = 20):
+    flag = False
+    if count > 20:
+        count  = 20
+        flag = True
+   
+
+    await ctx.channel.purge(limit=count)
+
+    if flag:
+        ctx.send("Messages to delete cannot be greater than 20")
+    
+    #await ctx.message.delete()
+
 
 #Past this point are event handlings
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx : context.Context, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Please send in all required arguments")
 
     print(error)
 
 @verify.error
-async def verifyError(ctx, error):
+async def verifyError(ctx : context.Context, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Please specify a FACEIT username to begin verification steps ")
 
