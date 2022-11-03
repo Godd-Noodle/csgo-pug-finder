@@ -19,8 +19,15 @@ creds_discord = json.loads(data)
 
 
 TOKEN = str(creds_discord["TOKEN"])
-PREFIX = str(creds_discord["PREFIX"])
+PREFIX = "/"
 FACEIT_TOKEN = str(creds_discord["FACEIT"])
+URL = str(creds_discord["URL"])
+PORT  =  str(creds_discord["PORT"])
+USERNAME = str(creds_discord["USERNAME"])
+PASSWORD = str(creds_discord["PASSWORD"])
+
+
+
 intents = discord.Intents.all()
 intents.members = True
 
@@ -214,3 +221,10 @@ async def verifyError(ctx : context.Context, error):
         await ctx.send("Please specify a FACEIT username to begin verification steps ")
 
 bot.run(TOKEN)
+del(TOKEN)
+del(PREFIX)
+del(FACEIT_TOKEN)
+del(URL)
+del(PORT)
+del(USERNAME)
+del(PASSWORD)
