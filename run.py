@@ -1,9 +1,7 @@
-from cgi import test
 import discord
 from discord.ext import commands
 from discord.utils import get
 import urllib.request, urllib.error, urllib.parse
-import numpy as np
 from  faceit import FaceitData
 import discord.ext.commands.context as context
 #from discord.ext.commands import has_role
