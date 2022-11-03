@@ -70,16 +70,16 @@ async def ready(ctx : context.Context):
         return
 
 
-    authorRoles = ", ".join([str(r.name) for r in ctx.author.roles])
-    print(authorRoles)
+    authorRoles = [str(r.name) for r in ctx.author.roles]
+    #print(authorRoles)
     readyRole = get(ctx.message.guild.roles, name='Ready')
-    if not  authorRoles.find("Ready") == -1:
+    if readyRole in authorRoles:
         await ctx.author.remove_roles(readyRole)
     else:
         
         await ctx.author.add_roles(readyRole)
     
-    ctx.message.delete()
+    await ctx.message.delete()
 
 
 @bot.command(name = "roles")
@@ -151,9 +151,9 @@ async def verify(ctx : context.Context, arg):
 
     print(lvl)
 
-    roleLinked = discord.utils.get(ctx.author.guild.roles, name = "Linked")
+    roleLinked = get(ctx.author.guild.roles, name = "Linked")
     await ctx.author.add_roles(roleLinked)
-    roleFaceitLevel = discord.utils.get(ctx.author.guild.roles, name = "Level " + str(lvl))
+    roleFaceitLevel = get(ctx.author.guild.roles, name = "Level " + str(lvl))
     await ctx.author.add_roles(roleFaceitLevel)
     
     
@@ -180,7 +180,7 @@ async def lobby(ctx : context.Context, *arg):
     if not str(ctx.channel) == channel:
         print(f"Not correct channel '{ctx.channel}', looking for '{channel}'")
         return
-    channelLL = discord.utils.get(ctx.guild.text_channels, name="live-lobbies")
+    channelLL = get(ctx.guild.text_channels, name="live-lobbies")
     message = await channelLL.send(f"Faceit lobby created\n\nPlayers:\n{str(ctx.author.mention)}\n\nRange:\nNOT IMPLEMENTED YET")
     await message.add_reaction(get(ctx.guild.emojis, name="tick"))
     
