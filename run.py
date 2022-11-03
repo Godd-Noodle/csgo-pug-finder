@@ -123,11 +123,11 @@ async def verify(ctx : context.Context, arg):
     match_details = FaceitData.player_details(fd,arg,"csgo")
     
     #print(match_details)
-    elo = str(match_details["games"]["csgo"]["faceit_elo"])
-    lvl = str(match_details["games"]["csgo"]["skill_level"])
+    elo = match_details["games"]["csgo"]["faceit_elo"]
+    lvl = match_details["games"]["csgo"]["skill_level"]
     urlSteamFull = urlSteam +  match_details["steam_id_64"]
 
-    await ctx.send(elo + " " + lvl)
+    await ctx.send(f"{elo},{lvl}")
 
 
     if (elo == 0):
@@ -140,11 +140,11 @@ async def verify(ctx : context.Context, arg):
     webcontentsteam = str(response.read())
     p_s = webcontentsteam.find(str('<div class="profile_summary">'))
     p_e = webcontentsteam.find(str('<div class="profile_summary_footer">'))
-    found = webcontentsteam[p_s:p_e].find(str(ctx.author))
+    found = str(ctx.author) in webcontentsteam[p_s:p_e]
     #print(found)
 
 
-    if (found == -1):
+    if not found:
         await ctx.send(f"`could not find your discord id '{ctx.author}' on this steam profile's bio, ensure it has this so we can verify that it is your account we are linking to your FACEIT`")
         return
     
